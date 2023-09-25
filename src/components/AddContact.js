@@ -1,5 +1,6 @@
 import React from "react";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
 
 class AddContact extends React.Component {
   constructor(props) {
@@ -25,6 +26,8 @@ class AddContact extends React.Component {
     return (
       <div className="container">
         <h2 className="text-center">Add Contact</h2>
+
+        <a href="/" className="btn btn-primary">Go To List</a>
         <form onSubmit={this.handleFromSubmit}>
           <div className="mb-3">
             <label for="exampleInputEmail1" className="form-label">

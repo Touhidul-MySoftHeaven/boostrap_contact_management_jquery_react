@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { v4 as uuid } from 'uuid';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Routes,
+} from "react-router-dom";
 import Header from "./Header";
 import ContactList from "./ContactList";
 import AddContact from "./AddContact";
@@ -6,29 +13,16 @@ import $ from "jquery";
 import Swal from "sweetalert2";
 
 function App() {
-  // const contacts = [
-  //   {
-  //     id: 1,
-  //     name: "abm",
-  //     email: "abm@mail.com",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "abm1",
-  //     email: "abm1@mail.com",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "abm2",
-  //     email: "abm2@mail.com",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "abm3",
-  //     email: "abm3@mail.com",
-  //   },
-  // ];
-  const [contacts, setcontacts] = useState([]);
+
+  const LOCAL_STORAGE_KEY="contacts";
+ 
+    const retriveContacts=localStorage.getItem(LOCAL_STORAGE_KEY);
+    let parsedJsonContacts = [];
+    if (retriveContacts) {
+      parsedJsonContacts = JSON.parse(retriveContacts);
+    }
+
+  const [contacts, setcontacts] = useState(parsedJsonContacts);
   const addContactHandler = (contact) => {
     var flag = true;
     $.each(contacts, function (key, value) {
@@ -39,7 +33,7 @@ function App() {
       }
     });
     if (flag) {
-      setcontacts([...contacts, contact]);
+      setcontacts([...contacts, {id:uuid(),...contact}]);
       console.log(contact);
     }
   };
@@ -50,12 +44,35 @@ function App() {
     setcontacts(filteredContacts);
   };
 
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
+  }, [contacts]);
+
+
+
   return (
     <div className="container">
+      <Router>
       <Header />
-
-      <AddContact addContactHandler={addContactHandler}></AddContact>
-      <ContactList contactList={contacts} deleteContact={deleteContact} />
+      {/* <AddContact addContactHandler={addContactHandler}></AddContact> */}
+        <Routes>
+        <Route
+            path="/"
+            Component={() => (
+              <ContactList contactList={contacts} deleteContact={deleteContact} />
+            )}
+          />
+          <Route
+            path="/add"
+            Component={() => (
+              <AddContact addContactHandler={addContactHandler}></AddContact>
+            )}
+          />
+        </Routes>
+      </Router>
+     
+      
+      
     </div>
   );
 }

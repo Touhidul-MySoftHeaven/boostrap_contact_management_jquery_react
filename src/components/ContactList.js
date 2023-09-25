@@ -10,7 +10,14 @@ export default function ContactList(props) {
   });
 
   return (
-    <div className="col-md-12">
+    <div>
+      <div className="row">
+      <div className="col-md-4"></div>
+      <div className="col-md-4"></div>
+      <div className="col-md-4"><a href="/add" className="btn btn-primary">Add Contact</a></div>
+      </div>
+      
+       <div className="col-md-12">
       <table className="table">
         <thead>
           <tr>
@@ -23,5 +30,7 @@ export default function ContactList(props) {
         <tbody>{renderContactList}</tbody>
       </table>
     </div>
+    </div>
+   
   );
 }
