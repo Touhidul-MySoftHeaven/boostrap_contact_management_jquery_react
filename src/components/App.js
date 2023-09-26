@@ -5,25 +5,47 @@ import {
   Switch,
   Route,
   Routes,
+  Redirect 
 } from "react-router-dom";
 import Header from "./Header";
 import ContactList from "./ContactList";
 import AddContact from "./AddContact";
 import $ from "jquery";
 import Swal from "sweetalert2";
+import ContactDetails from "./ContactDetails";
+import api from '../api/contact';
+import UpdateContact from "./UpdateContact"
 
 function App() {
 
   const LOCAL_STORAGE_KEY="contacts";
- 
-    const retriveContacts=localStorage.getItem(LOCAL_STORAGE_KEY);
-    let parsedJsonContacts = [];
-    if (retriveContacts) {
-      parsedJsonContacts = JSON.parse(retriveContacts);
-    }
+  const [contacts, setcontacts] = useState([]);
+  const retrieveContacts = async () => {
+    const response = await api.get("/contacts");
+    return response.data;
+  };  
+  useEffect(() => {
+    // const retriveContacts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    // if (retriveContacts) setcontacts(retriveContacts);
+    const getAllCOntacts = async () => {
+      const allContacts = await retrieveContacts();
+      if (allContacts) setcontacts(allContacts);
+    };
 
-  const [contacts, setcontacts] = useState(parsedJsonContacts);
-  const addContactHandler = (contact) => {
+    getAllCOntacts();
+  }, []);
+
+    // const retriveContacts=localStorage.getItem(LOCAL_STORAGE_KEY);
+    // console.log(retriveContacts);
+    // console.log(retriveContactsfromAPi());
+    // let parsedJsonContacts = [];
+    // if (retriveContacts) {
+    //   parsedJsonContacts = JSON.parse(retriveContacts);
+    // }
+   
+
+  
+  const addContactHandler =async (contact) => {
     var flag = true;
     $.each(contacts, function (key, value) {
       if (value.email == contact.email) {
@@ -33,20 +55,48 @@ function App() {
       }
     });
     if (flag) {
-      setcontacts([...contacts, {id:uuid(),...contact}]);
-      console.log(contact);
+      const request = {
+        id: uuid(),
+        ...contact,
+      };
+  
+      const response = await api.post("/contacts", request);
+      setcontacts([...contacts, response.data]);
+      
     }
   };
-  const deleteContact = (email) => {
+  const deleteContact =async (id) => {
+    await api.delete(`/contacts/${id}`);
     const filteredContacts = contacts.filter((contact) => {
-      return contact.email !== email;
+      return contact.id !== id;
     });
     setcontacts(filteredContacts);
   };
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contacts));
-  }, [contacts]);
+  const updateContactHandler = async (contact) => {
+  
+    var flag = true;
+    $.each(contacts, function (key, value) {
+      if (value.id != contact.id ) {
+        if(value.email == contact.email)
+        {
+          Swal.fire("Email Already in the List");
+          flag = false;
+          return;
+        }
+        
+      }
+    });
+    if (flag) {
+      const response = await api.put(`/contacts/${contact.id}`, contact);
+    const { id, name, email } = response.data;
+    setcontacts(
+      contacts.map((contact) => {
+        return contact.id === id ? { ...response.data } : contact;
+      })
+    );
+    }
+  };
+ 
 
 
 
@@ -67,6 +117,16 @@ function App() {
             Component={() => (
               <AddContact addContactHandler={addContactHandler}></AddContact>
             )}
+          />
+
+          <Route
+            path="/contact/details/:id"
+            Component={() => <ContactDetails />}
+          />
+
+           <Route
+            path="/contact/update/:id"
+            Component={() => <UpdateContact updateContactHandler={updateContactHandler}/>}
           />
         </Routes>
       </Router>

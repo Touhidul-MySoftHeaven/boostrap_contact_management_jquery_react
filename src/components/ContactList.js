@@ -1,5 +1,6 @@
 import React from "react";
 import ContactCard from "./ContactCard";
+import { Link } from "react-router-dom";
 
 export default function ContactList(props) {
 
@@ -14,7 +15,9 @@ export default function ContactList(props) {
       <div className="row">
       <div className="col-md-4"></div>
       <div className="col-md-4"></div>
-      <div className="col-md-4"><a href="/add" className="btn btn-primary">Add Contact</a></div>
+      <div className="col-md-4">
+        <Link to='/add' className="btn btn-primary">Go to Add Form</Link>
+      </div>
       </div>
       
        <div className="col-md-12">
