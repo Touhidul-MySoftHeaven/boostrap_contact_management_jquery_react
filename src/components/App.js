@@ -20,6 +20,29 @@ function App() {
 
   const LOCAL_STORAGE_KEY="contacts";
   const [contacts, setcontacts] = useState([]);
+  const [searchKeyword,setsearchKeyword]=useState("");
+  const [searchResult,setsearchResult]=useState([]);
+  
+  const searchFunction=(searchKeyword)=>{
+       setsearchKeyword(searchKeyword);
+       if(searchKeyword !=="")
+       {
+         const searchResultAfterFilter=contacts.filter((contact)=>{
+          return Object.values(contact)
+          .join(" ")
+          .toLowerCase()
+          .includes(searchKeyword.toLowerCase());
+         })
+         setsearchResult(searchResultAfterFilter);
+       }else
+       {
+        setsearchResult(contacts);
+       }
+  }
+ 
+
+
+
   const retrieveContacts = async () => {
     const response = await api.get("/contacts");
     return response.data;
@@ -109,7 +132,7 @@ function App() {
         <Route
             path="/"
             Component={() => (
-              <ContactList contactList={contacts} deleteContact={deleteContact} />
+              <ContactList contactList={searchKeyword.length < 1 ? contacts : searchResult} deleteContact={deleteContact} searchKeyword={searchKeyword} searchFunction={searchFunction}/>
             )}
           />
           <Route

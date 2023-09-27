@@ -1,8 +1,13 @@
-import React from "react";
+import React,{useRef} from "react";
 import ContactCard from "./ContactCard";
 import { Link } from "react-router-dom";
 
 export default function ContactList(props) {
+  const inputSerach=useRef("");
+
+  const searchHanler=(e)=>{
+    props.searchFunction(inputSerach.current.value);
+  }
 
   const renderContactList = props.contactList.map((contact,index) => {
     return (
@@ -20,7 +25,8 @@ export default function ContactList(props) {
       </div>
       </div>
       
-       <div className="col-md-12">
+       <div className="col-md-12 ">
+        <input type="text" ref={inputSerach} className="form-control my-5" value={props.searchKeyword} onChange={searchHanler}/>
       <table className="table">
         <thead>
           <tr>
